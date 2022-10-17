@@ -107,7 +107,7 @@ $resourceGroupName = "data-engineering-synapse-$suffix"
 # (required to balance resource capacity across regions)
 Write-Host "Selecting a region for deployment..."
 
-$preferred_list = "australiaeast","northeurope", "southeastasia","uksouth","westeurope","westus","westus2"
+$preferred_list = "brazilsouth","australiaeast","westeurope","canadacentral","westus3","japaneast"
 $locations = Get-AzLocation | Where-Object {
     $_.Providers -contains "Microsoft.Synapse" -and
     $_.Providers -contains "Microsoft.Databricks" -and
@@ -138,7 +138,7 @@ while ($success -ne 1){
         New-AzSqlServer -ResourceGroupName $resourceGroupName -Location $random_location -ServerName $testServer -ServerVersion "12.0" -SqlAdministratorCredentials $testCred -ErrorAction Stop | Out-Null
     }
     catch {
-      Remove-AzResourceGroup -Name $resourceGroupName -Force
+      Remove-AzResourceGroup -Name $resourceGroupName -Force | Out-Null
       $success = 0
       $tried_list.Add($random_location)
       $locations = $locations | Where-Object {$_.Location -notin $tried_list}
@@ -148,7 +148,7 @@ while ($success -ne 1){
 }
 Remove-AzSqlServer -ResourceGroupName $resourceGroupName -ServerName $testServer | Out-Null
 
-Write-Host "Selected region: $random_location"
+Write-Host "`n`nSelected region: $random_location"
 
 # Use ARM template to deploy resources
 Write-Host "Creating Azure resources. This may take some time..."
